@@ -42,30 +42,50 @@ nav_msgs::Odometry odom_msg;
 
 void VelocityCallBack(const gazebo_msgs::LinkStates &msg)
 {
-	int index = 0;
 	std::string str2("base_link");
-	for (int i = 0; i < sizeof(msg.name); i++)
+
+	bool found_index = false;
+	size_t index;
+	for (index = 0; index < msg.name.size(); index++)
 	{
 
-		if (msg.name[i].find(str2) != std::string::npos)
+		if (msg.name[index].find(str2) != std::string::npos)
+		{
+			found_index = true;
 			break;
-		index += 1;
+		}
 	}
-	//ROS_INFO_STREAM("fOUND IN: " << index);
+
+	if (!found_index)
+	{
+		ROS_WARN_STREAM("Mobile Robot State Publisher: velocity callback() - index not found");
+		return;
+	}
+
+	// ROS_INFO_STREAM("fOUND IN: " << index);
 	pos = msg.pose[index];
 	odom_msg.twist.twist = msg.twist[index];
 	odom_msg.pose.pose = msg.pose[index];
 	odom_msg.child_frame_id = "base_link";
 	odom_msg.header.frame_id = "odom";
 	odom_msg.header.stamp = ros::Time::now();
-	/* This is done because the ukf does not match the position in Gazebo */
-	static tf::TransformBroadcaster br;
-	tf::Transform transform;
-	transform.setOrigin(tf::Vector3(pos.position.x, pos.position.y, pos.position.z));
-	tf::Quaternion q(pos.orientation.x, pos.orientation.y, pos.orientation.z, pos.orientation.w);
 
-	transform.setRotation(q);
-	br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "odom", "base_link"));
+	try
+	{
+
+		/* This is done because the ukf does not match the position in Gazebo */
+		static tf::TransformBroadcaster br;
+		tf::Transform transform;
+		transform.setOrigin(tf::Vector3(pos.position.x, pos.position.y, pos.position.z));
+		tf::Quaternion q(pos.orientation.x, pos.orientation.y, pos.orientation.z, pos.orientation.w);
+
+		transform.setRotation(q);
+		br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "odom", "base_link"));
+	}
+	catch (std::runtime_error e)
+	{
+		std::cout << "mbrobot: exception in transform: " << e.what() << "\n";
+	}
 }
 
 int main(int argc, char **argv)
@@ -113,7 +133,7 @@ int main(int argc, char **argv)
 
 	ros::Publisher state_pub_ =
 		n.advertise<geometry_msgs::PoseStamped>(robot_state_topic, 10);
-	//ros::Publisher link_state_pub_ =
+	// ros::Publisher link_state_pub_ =
 	//		n.advertise<geometry_msgs::Pose>("/gazebo/set_link_state", 10);
 	ros::ServiceClient link_state_client_ = n.serviceClient<gazebo_msgs::SetLinkState>("/gazebo/set_link_state");
 
@@ -128,10 +148,10 @@ int main(int argc, char **argv)
 
 	ros::Publisher odom_pub_ = n.advertise<nav_msgs::Odometry>("/odometry/filtered", 10);
 
-	//Intermidiate variables
+	// Intermidiate variables
 	double ysqr, t3, t4;
 	geometry_msgs::TransformStamped transformStamped;
-	ros::Rate r(20.0);
+	ros::Rate r(rate);
 	while (n.ok())
 	{
 		/*
@@ -148,7 +168,6 @@ int main(int argc, char **argv)
 		*/
 		pose_msg.header.frame_id = "odom";
 		pose_msg.header.stamp = ros::Time::now();
-		;
 
 		ysqr = odom_msg.pose.pose.orientation.y * odom_msg.pose.pose.orientation.y;
 		t3 = +2.0 * (odom_msg.pose.pose.orientation.w * odom_msg.pose.pose.orientation.z + odom_msg.pose.pose.orientation.x * odom_msg.pose.pose.orientation.y);
@@ -171,7 +190,7 @@ int main(int argc, char **argv)
 		link.request.link_state.pose.orientation.w = transformStamped.transform.rotation.w;
 		link_state_client_.call(link);
 		 */
-		//link_state_pub_.publish(link);
+		// link_state_pub_.publish(link);
 		odom_pub_.publish(odom_msg);
 		ros::spinOnce();
 		r.sleep();
