@@ -10,17 +10,14 @@ find_package(catkin REQUIRED COMPONENTS
         tf2
         tf2_ros
         tf2_geometry_msgs
-	    nav_msgs
-        )
+        nav_msgs
+)
 
 ###################################
 ## catkin specific configuration ##
 ###################################
 catkin_package(
-        #  INCLUDE_DIRS include
-        #  LIBRARIES turtle_tf2
         CATKIN_DEPENDS geometry_msgs roscpp rospy std_msgs tf2 tf2_ros
-        #  DEPENDS system_lib
 )
 
 ###########
