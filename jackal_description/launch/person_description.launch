@@ -1,9 +1,0 @@
-<launch>
-  <arg name="config" default="base" />
-
-  <param name="person_description"
-         command="$(find jackal_description)/scripts/env_run
-                    $(find jackal_description)/urdf/configs/$(arg config)
-                    $(find xacro)/xacro $(find jackal_description)/urdf/person.urdf.xacro
-                    --inorder" />
-</launch>

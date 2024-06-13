@@ -3,8 +3,6 @@
   <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       <robotNamespace>/</robotNamespace>
-      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
-      <legacyModeNS>true</legacyModeNS>
     </plugin>
   </gazebo>
 
@@ -14,12 +12,12 @@
       <updateRate>50.0</updateRate>
       <bodyName>imu_link</bodyName>
       <topicName>imu/data</topicName>
-      <accelDrift>0.00 0.00 0.00</accelDrift>
-      <accelGaussianNoise>0.00 0.00 0.00</accelGaussianNoise>
-      <rateDrift>0.00 0.00 0.00 </rateDrift>
-      <rateGaussianNoise>0.00 0.00 0.00 </rateGaussianNoise>
-      <headingDrift>0.00</headingDrift>
-      <headingGaussianNoise>0.00</headingGaussianNoise>
+      <accelDrift>0.005 0.005 0.005</accelDrift>
+      <accelGaussianNoise>0.005 0.005 0.005</accelGaussianNoise>
+      <rateDrift>0.005 0.005 0.005 </rateDrift>
+      <rateGaussianNoise>0.005 0.005 0.005 </rateGaussianNoise>
+      <headingDrift>0.005</headingDrift>
+      <headingGaussianNoise>0.005</headingGaussianNoise>
     </plugin>
   </gazebo>
 
@@ -31,91 +29,14 @@
       <frameId>base_link</frameId>
       <topicName>/navsat/fix</topicName>
       <velocityTopicName>/navsat/vel</velocityTopicName>
-      <referenceLatitude>49.9</referenceLatitude>
-      <referenceLongitude>8.9</referenceLongitude>
-      <referenceHeading>0</referenceHeading>
+      <referenceLatitude>$(optenv GAZEBO_WORLD_LAT 49.9)</referenceLatitude>
+      <referenceLongitude>$(optenv GAZEBO_WORLD_LON 8.9)</referenceLongitude>
+      <referenceHeading>90</referenceHeading>
       <referenceAltitude>0</referenceAltitude>
-      <drift>0.000 0.000 0.000</drift>
+      <drift>0.0001 0.0001 0.0001</drift>
     </plugin>
   </gazebo>
 
-  <!-- hokuyo
-  <gazebo reference="VLP16_base_link">
-    <sensor name='center_laser_sensor' type='ray'>
-      <ray>
-        <scan>
-          <horizontal>
-            <samples>1875</samples>
-            <resolution>1</resolution>
-            <min_angle>-3.14</min_angle>
-            <max_angle>3.14</max_angle>
-          </horizontal>
-          <vertical>
-            <samples>16</samples>
-            <min_angle>-0.1</min_angle>
-            <max_angle>-0.35</max_angle>
-          </vertical>
-        </scan>
-        <range>
-          <min>0.2</min>
-          <max>30</max>
-          <resolution>0.01</resolution>
-        </range>
-      </ray>
-      <plugin name='center_laser' filename='libgazebo_ros_laser.so'>
-        <topicName>/velodyne_scan1</topicName>
-        <frameName>VLP16</frameName>
-        <min_range>0.9</min_range>
-        <max_range>130.0</max_range>
-        <gaussianNoise>0.008</gaussianNoise>
-      </plugin>
-      <always_on>1</always_on>
-      <update_rate>30</update_rate>
-    </sensor>
-  </gazebo>
-  -->
-<!--
-  <gazebo reference="VLP16">
-        <sensor type="ray" name="jackal-VLP16">
-          <pose>0 0 0 0 0 0</pose>
-          <visualize>false</visualize>
-          <update_rate>10</update_rate>
-          <ray>
-            <scan>
-              <horizontal>
-                <samples>1875</samples>
-                <resolution>1</resolution>
-                <min_angle>-${PI}</min_angle>
-                <max_angle> ${PI}</max_angle>
-              </horizontal>
-              <vertical>
-                <samples>16</samples>
-                <resolution>1</resolution>
-                <min_angle>-${15.0*PI/180.0}</min_angle>
-                <max_angle> ${15.0*PI/180.0}</max_angle>
-              </vertical>
-            </scan>
-            <range>
-              <min>0.055</min>
-              <max>140.0</max>
-              <resolution>0.001</resolution>
-            </range>
-            <noise>
-              <type>gaussian</type>
-              <mean>0.0</mean>
-              <stddev>0.0</stddev>
-            </noise>
-          </ray>
-          <plugin name="gazebo_ros_laser_controller" filename="libgazebo_ros_velodyne_laser.so">
-            <topicName>velodyne_pointcloud</topicName>
-            <frameName>/VLP16</frameName>
-            <min_range>0.9</min_range>
-            <max_range>130.0</max_range>
-            <gaussianNoise>0.008</gaussianNoise>
-          </plugin>
-        </sensor>
-      </gazebo>
--->
   <gazebo reference="base_link">
     <turnGravityOff>false</turnGravityOff>
   </gazebo>
@@ -124,7 +45,7 @@
     <material>Gazebo/DarkGrey</material>
     <turnGravityOff>false</turnGravityOff>
   </gazebo>
-    <gazebo reference="imu_link">
+  <gazebo reference="imu_link">
     <turnGravityOff>false</turnGravityOff>
   </gazebo>
 
@@ -132,7 +53,11 @@
     <material>Gazebo/DarkGrey</material>
     <turnGravityOff>false</turnGravityOff>
   </gazebo>
-  <gazebo reference="fenders_link">
+  <gazebo reference="front_fender_link">
+    <material>Gazebo/Yellow</material>
+    <turnGravityOff>false</turnGravityOff>
+  </gazebo>
+  <gazebo reference="rear_fender_link">
     <material>Gazebo/Yellow</material>
     <turnGravityOff>false</turnGravityOff>
   </gazebo>

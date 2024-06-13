@@ -1,3 +1,7 @@
+NavfnROS:
+  allow_unknown: false
+  # default_tolerance: 0.1
+
 TrajectoryPlannerROS:
 
   # Robot Configuration Parameters
